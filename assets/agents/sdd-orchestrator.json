@@ -173,6 +173,11 @@
     ],
     [
       "subagent",
+      "android-research",
+      "allow"
+    ],
+    [
+      "subagent",
       "android-review",
       "allow"
     ],

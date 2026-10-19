@@ -676,8 +676,12 @@ func (r *run) servers(values map[string]string) (map[string]render.MCPServer, []
 			wanted[name] = s
 		}
 	}
-	return wanted, render.ServerNames(catalog["core"]), nil
+	return wanted, append(render.ServerNames(catalog["core"]), userServers...), nil
 }
+
+// userServers are MCP servers the user configures outside the installer. They
+// are never installed; they are listed only so agent rules name their tools.
+var userServers = []string{"context7", "firebase"}
 
 func sortedKeys[V any](m map[string]V) []string {
 	keys := make([]string, 0, len(m))

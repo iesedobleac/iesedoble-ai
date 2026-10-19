@@ -1009,8 +1009,8 @@ var profileGuide = map[string][]string{
 		"Suits: your strongest model, high effort.",
 	},
 	"analyst": {
-		"Analyst: sdd-discovery, sdd-constitution, sdd-tasks.",
-		"Understands the project and structures the work, following the plan.",
+		"Analyst: sdd-discovery, sdd-constitution, sdd-tasks, android-research.",
+		"Understands the project, researches documentation, and structures the work.",
 		"",
 		"Suits: a balanced model, medium effort.",
 	},

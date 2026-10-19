@@ -163,6 +163,11 @@
     ],
     [
       "subagent",
+      "android-research",
+      "allow"
+    ],
+    [
+      "subagent",
       "android-worker",
       "allow"
     ],

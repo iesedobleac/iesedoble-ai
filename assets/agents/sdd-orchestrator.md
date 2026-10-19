@@ -79,9 +79,11 @@ summary of the changed sections only.
   the shell.
 {{/other}}- Keep shell output bounded (`--stat`, counts, `| tail -40`). Never run Gradle
   builds or suites inline; the executing subagent runs the agreed checks.
-- Web documentation and library sources (including jars in the Gradle cache):
-  delegate to `android-explore` with the URL or artifact and the exact question;
-  it returns only the relevant excerpt. Do not use {{webfetch}} yourself.
+- Web documentation: delegate to `android-research` with the exact question,
+  the library version, and any URL; it returns verbatim excerpts with their
+  URLs. Library sources (jars in the Gradle cache): delegate to
+  `android-explore` with the artifact and the question. Do not use
+  {{webfetch}} yourself.
 - Never create or rebuild a CodeGraph index; the developer owns the index
   lifecycle. If a repository has no index, tell the user to run
   `codegraph init` in the repository root.

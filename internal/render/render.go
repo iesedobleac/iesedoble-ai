@@ -275,6 +275,9 @@ func ClaudeTools(a Agent, all []Agent, mcpServers []string) []string {
 	if a.allows("webfetch") {
 		add("WebFetch")
 	}
+	if a.allows("websearch") {
+		add("WebSearch")
+	}
 	if a.Mode == "primary" && a.allows("question") {
 		add("AskUserQuestion")
 	}

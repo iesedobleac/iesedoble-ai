@@ -52,12 +52,12 @@
       "allow"
     ],
     [
-      "execute",
+      "firebase_*",
       "*",
       "allow"
     ],
     [
-      "webfetch",
+      "execute",
       "*",
       "allow"
     ],

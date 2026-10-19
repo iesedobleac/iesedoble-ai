@@ -110,7 +110,7 @@ go install github.com/iesedobleac/iesedoble-ai/cmd/iesedoble-ai@latest
 
 | | OpenCode | Claude Code |
 |---|---|---|
-| 🤖 **Agents** | 14 agents with per-agent permissions; orchestrators are primary agents | 14 subagents with tool lists; run an orchestrator with `claude --agent <name>` |
+| 🤖 **Agents** | 15 agents with per-agent permissions; orchestrators are primary agents | 15 subagents with tool lists; run an orchestrator with `claude --agent <name>` |
 | 📚 **Skills** | `sdd-workflow`, `skill-generator` | Same |
 | 📏 **Rules** | Managed block in `AGENTS.md` | Managed block in `CLAUDE.md` |
 | 🛡 **Safety** | Per-agent shell rules | Session deny rules for `git push`, `git reset --hard`, `git clean`, `git rebase`; optional sandbox for shell commands |
@@ -160,12 +160,13 @@ flowchart LR
 
 ### Android
 
-`android-orchestrator` handles small and medium Android tasks without SDD phases. Its four
+`android-orchestrator` handles small and medium Android tasks without SDD phases. Its five
 subagents also serve the SDD flow.
 
 | Agent | Role |
 |---|---|
 | `android-explore` | Read-only explorer: maps files, symbols and impact, CodeGraph first |
+| `android-research` | Answers documentation questions from the web with verbatim quotes and URLs |
 | `android-worker` | Implements closed, already-designed tasks within the allowed files |
 | `android-review` | Reviews a diff against its task and the project style; never edits |
 | `android-device` | Installs builds and drives `adb`, screenshots, logcat and perfetto |
@@ -178,7 +179,7 @@ compounds, save where the work is mechanical.
 | Role | Used by | What suits it | Claude Code default |
 |---|---|---|---|
 | **planner** | Orchestrators, `sdd-spec`, `sdd-clarify`, `sdd-plan` | Your strongest model, high effort: a bad plan compounds | `opus` · high |
-| **analyst** | `sdd-discovery`, `sdd-constitution`, `sdd-tasks` | A balanced model, medium effort | `sonnet` · medium |
+| **analyst** | `sdd-discovery`, `sdd-constitution`, `sdd-tasks`, `android-research` | A balanced model, medium effort | `sonnet` · medium |
 | **executor** | `android-worker`, `sdd-apply` | A balanced model, low effort: the thinking happened in the plan | `sonnet` · low |
 | **scout** | `android-explore`, `android-device` | Your fastest, cheapest model, low effort | `haiku` · low |
 | **reviewer** | `android-review`, `sdd-verify` | A strong model, ideally of another family than the executor | `opus` · medium |

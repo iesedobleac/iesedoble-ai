@@ -156,7 +156,7 @@ func TestInstallReinstallUninstall(t *testing.T) {
 	}
 	ocAgents := countFiles(t, filepath.Join(ocDir, "agents"))
 	clAgents := countFiles(t, filepath.Join(clDir, "agents"))
-	if ocAgents != 14 || clAgents != 14 {
+	if ocAgents != 15 || clAgents != 15 {
 		t.Fatalf("agents: opencode %d, claude %d", ocAgents, clAgents)
 	}
 	agentsMd, _ := os.ReadFile(filepath.Join(ocDir, "AGENTS.md"))

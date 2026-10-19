@@ -140,7 +140,7 @@ Choose **Install or update** and go through the six steps. Move with `↑`/`↓`
    | Role | Agents | What suits it |
    |---|---|---|
    | planner | Orchestrators, `sdd-spec`, `sdd-clarify`, `sdd-plan` | Strongest model, high effort: a bad plan compounds into a bad implementation |
-   | analyst | `sdd-discovery`, `sdd-constitution`, `sdd-tasks` | Balanced model, medium effort |
+   | analyst | `sdd-discovery`, `sdd-constitution`, `sdd-tasks`, `android-research` | Balanced model, medium effort |
    | executor | `android-worker`, `sdd-apply` | Balanced model, low effort; the cheapest only for trivial edits |
    | scout | `android-explore`, `android-device` | Fastest, cheapest model, low effort |
    | reviewer | `android-review`, `sdd-verify` | Strong model, medium effort; another model family than the executor catches different mistakes |

@@ -37,8 +37,8 @@ func TestAgentsRender(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(agents) != 14 {
-		t.Fatalf("expected 14 agents, got %d", len(agents))
+	if len(agents) != 15 {
+		t.Fatalf("expected 15 agents, got %d", len(agents))
 	}
 	servers := []string{"engram", "codegraph"}
 	for _, a := range agents {
@@ -88,8 +88,16 @@ func TestClaudeTools(t *testing.T) {
 	if worker != "Read, Grep, Glob, Edit, Write, Bash, mcp__codegraph__*" {
 		t.Errorf("android-worker tools: %s", worker)
 	}
+	explore := strings.Join(render.ClaudeTools(byName["android-explore"], agents, []string{"codegraph", "firebase"}), ", ")
+	if explore != "Read, Grep, Glob, Bash, mcp__codegraph__*, mcp__firebase__*" {
+		t.Errorf("android-explore tools: %s", explore)
+	}
+	research := strings.Join(render.ClaudeTools(byName["android-research"], agents, []string{"codegraph", "context7"}), ", ")
+	if research != "WebFetch, WebSearch, mcp__context7__*" {
+		t.Errorf("android-research tools: %s", research)
+	}
 	orch := strings.Join(render.ClaudeTools(byName["sdd-orchestrator"], agents, []string{"codegraph", "engram"}), ", ")
-	for _, want := range []string{"Agent(android-device, android-explore, android-review, android-worker, sdd-apply,", "mcp__engram__mem_search", "AskUserQuestion"} {
+	for _, want := range []string{"Agent(android-device, android-explore, android-research, android-review, android-worker, sdd-apply,", "mcp__engram__mem_search", "AskUserQuestion"} {
 		if !strings.Contains(orch, want) {
 			t.Errorf("sdd-orchestrator tools missing %q: %s", want, orch)
 		}

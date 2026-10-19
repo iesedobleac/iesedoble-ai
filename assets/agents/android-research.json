@@ -1,0 +1,30 @@
+{
+  "name": "android-research",
+  "description": "Web documentation researcher. Answers a parent-provided question from official docs through Context7, web search, and fetched pages, and returns verbatim excerpts with their URLs.",
+  "mode": "subagent",
+  "profile": "analyst",
+  "hidden": true,
+  "steps": null,
+  "rules": [
+    [
+      "*",
+      "*",
+      "deny"
+    ],
+    [
+      "webfetch",
+      "*",
+      "allow"
+    ],
+    [
+      "websearch",
+      "*",
+      "allow"
+    ],
+    [
+      "context7_*",
+      "*",
+      "allow"
+    ]
+  ]
+}

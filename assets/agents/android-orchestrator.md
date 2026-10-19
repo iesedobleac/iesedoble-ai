@@ -22,9 +22,11 @@ Development belongs to `sdd-orchestrator`; use it only if the user asks.
 - More evidence, more than about 5 sequential lookups, or an unfamiliar area:
   delegate one `android-explore` with a precise scope. Spot-check at most one
   claim; do not re-read what it mapped.
-- Web documentation and library sources (including jars in the Gradle cache):
-  delegate to `android-explore` with the URL or artifact and the exact
-  question. Do not use {{webfetch}} yourself.
+- Web documentation: delegate to `android-research` with the exact question,
+  the library version, and any URL; it returns verbatim excerpts with their
+  URLs. Library sources (jars in the Gradle cache): delegate to
+  `android-explore` with the artifact and the question. Do not use
+  {{webfetch}} yourself.
 - The shell is only for git and `gh` (status, diff, log, show, branch, add,
 {{#opencode}}  commit, PRs). Read with `read` and search with `grep`/`glob`; never `cat`,
   `sed`, `grep`, `find`, `unzip`, or similar in the shell. Use the shell
