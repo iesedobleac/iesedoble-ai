@@ -247,7 +247,10 @@ Settings step (200k compacts about where the OpenCode warning asks).
 
 ## Keep it up to date
 
-macOS:
+With a Homebrew install, the menu shows **Upgrade to vX** when a release is out: it runs
+`brew upgrade` and then syncs your last selection with the new version.
+
+By hand, on macOS:
 
 ```bash
 brew upgrade --cask iesedobleac/tap/iesedoble-ai

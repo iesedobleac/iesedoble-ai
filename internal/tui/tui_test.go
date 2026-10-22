@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -230,6 +231,42 @@ func TestPersonaChoice(t *testing.T) {
 	}
 	if view := m.persona.view(); !strings.Contains(view, "(•) None") || !strings.Contains(view, "Persona") || !strings.Contains(view, "Style") {
 		t.Errorf("components view:\n%s", view)
+	}
+}
+
+func TestUpgradeEntry(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
+	savedVersion, savedUpgrade := installer.Version, selfUpgrade
+	defer func() { installer.Version, selfUpgrade = savedVersion, savedUpgrade }()
+	installer.Version = "0.4.2"
+
+	selfUpgrade = func() []string { return nil }
+	next, _ := New().Update(latestMsg("0.4.3"))
+	m := next.(Model)
+	if view := m.View(); strings.Contains(view, "Upgrade to") || !strings.Contains(view, "v0.4.3 available") {
+		t.Errorf("without a self-upgrade the menu shows only the command:\n%s", view)
+	}
+
+	selfUpgrade = func() []string { return []string{"true"} }
+	m = New()
+	m = press(t, m, down) // on Sync before the release is known
+	next, _ = m.Update(latestMsg("0.4.3"))
+	m = next.(Model)
+	view := m.View()
+	if !strings.Contains(view, "Upgrade to v0.4.3") || strings.Contains(view, "v0.4.3 available") {
+		t.Errorf("menu with an upgrade:\n%s", view)
+	}
+	if m.menuEntries()[m.menu].act != actSync {
+		t.Errorf("cursor moved off Sync to %q", m.menuEntries()[m.menu].label)
+	}
+
+	next, _ = m.Update(upgradedMsg{})
+	if m := next.(Model); !m.upgraded {
+		t.Error("a successful upgrade should hand over to the new binary")
+	}
+	next, _ = m.Update(upgradedMsg{err: errors.New("exit status 1")})
+	if m := next.(Model); m.upgraded || m.screen != scDone || m.err == nil {
+		t.Errorf("a failed upgrade should show the error: %+v", m.err)
 	}
 }
 

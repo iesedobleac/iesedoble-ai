@@ -4,6 +4,8 @@ package tui
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
 	"slices"
 	"strconv"
 	"strings"
@@ -153,18 +155,44 @@ const (
 	actDoctor
 	actUninstall
 	actQuit
+	actUpgrade
 )
 
-var menuItems = []struct {
+type menuItem struct {
 	act         action
 	label, desc string
-}{
+}
+
+var menuItems = []menuItem{
 	{actInstall, "Install or update", "choose assistants, components and models"},
 	{actSync, "Sync", "re-apply the last selection (after an upgrade)"},
 	{actDoctor, "Doctor", "read-only health check"},
 	{actUninstall, "Uninstall", "remove everything this tool installed"},
 	{actQuit, "Quit", ""},
 }
+
+// selfUpgrade is the command that upgrades this binary; replaced in tests.
+var selfUpgrade = installer.SelfUpgrade
+
+// canUpgrade reports whether the menu offers to upgrade to a newer release.
+func (m Model) canUpgrade() bool {
+	return installer.NewerVersion(installer.Version, m.latest) && selfUpgrade() != nil
+}
+
+// menuEntries lists the menu entries, led by Upgrade when a newer release can be installed.
+func (m Model) menuEntries() []menuItem {
+	if !m.canUpgrade() {
+		return menuItems
+	}
+	desc := "brew upgrade, then reopen the menu"
+	if m.status != nil {
+		desc = "brew upgrade, then sync the last selection"
+	}
+	return append([]menuItem{{actUpgrade, "Upgrade to v" + m.latest, desc}}, menuItems...)
+}
+
+// upgradedMsg reports how the upgrade command ended.
+type upgradedMsg struct{ err error }
 
 // logLine is a log message, or with kind "step" an install step starting.
 type logLine struct {
@@ -233,6 +261,7 @@ type Model struct {
 	width      int
 	status     *installer.InstallStatus // recorded install, for the menu
 	latest     string                   // latest released version, once checked
+	upgraded   bool                     // the binary was upgraded; Run hands over to it
 }
 
 // New builds the model, preselecting the previous selection when there is one.
@@ -646,8 +675,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.status = installer.ReadStatus("")
 		return m, nil
 	case latestMsg:
+		had := m.canUpgrade()
 		m.latest = string(msg)
+		if !had && m.canUpgrade() {
+			m.menu++ // Upgrade now leads the menu; keep the cursor on its entry
+		}
 		return m, nil
+	case upgradedMsg:
+		if msg.err != nil {
+			m.screen, m.ok, m.res, m.logs = scDone, false, nil, nil
+			m.err = fmt.Errorf("upgrade failed (%w); run it yourself: %s", msg.err, installer.UpgradeCommand())
+			return m, nil
+		}
+		m.upgraded = true
+		return m, tea.Quit
 	case modelsMsg:
 		for t, list := range msg.lists {
 			m.avail[t], m.availErr[t], m.listed[t] = list, msg.errs[t], true
@@ -687,13 +728,16 @@ func (m Model) handleKey(msg tea.KeyMsg, key string) (tea.Model, tea.Cmd) {
 				m.menu--
 			}
 		case "down", "j":
-			if m.menu < len(menuItems)-1 {
+			if m.menu < len(m.menuEntries())-1 {
 				m.menu++
 			}
 		case "q", "esc":
 			return m, tea.Quit
 		case "enter":
-			switch menuItems[m.menu].act {
+			switch m.menuEntries()[m.menu].act {
+			case actUpgrade:
+				cmd := selfUpgrade()
+				return m, tea.ExecProcess(exec.Command(cmd[0], cmd[1:]...), func(err error) tea.Msg { return upgradedMsg{err} })
 			case actInstall:
 				m.screen = scTargets
 			case actSync:
@@ -1234,16 +1278,17 @@ func (m Model) menuView() string {
 			b.WriteString("  " + warnSty.Render("! Installed with v"+st.Version+": choose Sync to update it to v"+installer.Version) + "\n")
 		}
 	}
-	if installer.NewerVersion(installer.Version, m.latest) {
+	if installer.NewerVersion(installer.Version, m.latest) && !m.canUpgrade() {
 		b.WriteString("  " + selected.Render("↑ v"+m.latest+" available: ") + installer.UpgradeCommand() + "\n")
 	}
 
 	b.WriteString("\n  " + title.Render("Menu") + "\n\n")
+	entries := m.menuEntries()
 	width := 0
-	for _, it := range menuItems {
+	for _, it := range entries {
 		width = max(width, len(it.label))
 	}
-	for i, it := range menuItems {
+	for i, it := range entries {
 		label := fmt.Sprintf("%-*s", width, it.label)
 		if i == m.menu {
 			b.WriteString("  " + selected.Render("› "+label))
@@ -1433,6 +1478,29 @@ func componentCell(it item, width int) string {
 
 // Run starts the interactive installer.
 func Run() error {
-	_, err := tea.NewProgram(New(), tea.WithAltScreen()).Run()
-	return err
+	final, err := tea.NewProgram(New(), tea.WithAltScreen()).Run()
+	if err != nil {
+		return err
+	}
+	if m, ok := final.(Model); ok && m.upgraded {
+		return afterUpgrade(m.status != nil)
+	}
+	return nil
+}
+
+// afterUpgrade hands over to the upgraded binary: it syncs the last selection
+// when there is an install, or reopens the menu otherwise.
+func afterUpgrade(installed bool) error {
+	bin, err := exec.LookPath("iesedoble-ai")
+	if err != nil {
+		return fmt.Errorf("upgraded, but the new binary is not in PATH: %w", err)
+	}
+	var args []string
+	if installed {
+		fmt.Println("Upgraded. Syncing the last selection with the new version…")
+		args = []string{"sync"}
+	}
+	cmd := exec.Command(bin, args...)
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+	return cmd.Run()
 }

@@ -120,6 +120,22 @@ func parseVersion(v string) ([3]int, bool) {
 	return out, true
 }
 
+// SelfUpgrade is the command that upgrades this binary in place, or nil when
+// it was not installed in a way the menu can upgrade (only Homebrew for now).
+func SelfUpgrade() []string {
+	exe, err := os.Executable()
+	if err != nil {
+		return nil
+	}
+	if real, err := filepath.EvalSymlinks(exe); err == nil {
+		exe = real
+	}
+	if strings.Contains(filepath.ToSlash(exe), "/Caskroom/"+toolName+"/") {
+		return []string{"brew", "upgrade", "--cask", toolName}
+	}
+	return nil
+}
+
 // UpgradeCommand is how to install a newer version on this system.
 func UpgradeCommand() string {
 	switch runtime.GOOS {
