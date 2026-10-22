@@ -219,6 +219,7 @@ iesedoble-ai uninstall   # remove everything it installed
 | `--with` | Add components that are off by default: `subagent-monitor`, `claude-sandbox` |
 | `--persona` | `architect` (default) or `none` |
 | `--concise` | Caveman-style concise replies (default on; `--concise=false` to skip) |
+| `--spec-language` | Language of the SDD spec, plan and tasks: `es` (default) or `en` |
 | `--planner`, `--analyst`, `--executor`, `--scout`, `--reviewer` | OpenCode model per role |
 | `--claude-planner`, `--claude-analyst`, … `--claude-reviewer` | Claude Code model per role |
 | `--claude-planner-effort`, … `--claude-reviewer-effort` | Claude Code effort per role: `auto`, `low`, `medium`, `high`, `xhigh`, `max` |

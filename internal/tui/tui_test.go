@@ -233,6 +233,27 @@ func TestPersonaChoice(t *testing.T) {
 	}
 }
 
+func TestSpecLanguageChoice(t *testing.T) {
+	t.Setenv("HOME", t.TempDir())
+	m := New()
+	if l := m.options().Components.SpecLanguage; l != "es" {
+		t.Fatalf("default spec language %q", l)
+	}
+	for i, it := range m.persona.items {
+		if it.key == "spec-en" {
+			m.persona.cursor = i
+		}
+	}
+	m.persona.update(" ")
+	opts := m.options()
+	if opts.Components.SpecLanguage != "en" || opts.Components.Persona != "architect" {
+		t.Errorf("after choosing English: %+v", opts.Components)
+	}
+	if view := m.persona.view(); !strings.Contains(view, "SDD documents") || !strings.Contains(view, "(•) English") {
+		t.Errorf("persona view:\n%s", view)
+	}
+}
+
 func TestPersonaStep(t *testing.T) {
 	t.Setenv("HOME", t.TempDir())
 	m := New()

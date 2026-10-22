@@ -55,16 +55,29 @@ type Components struct {
 	Persona string `json:"persona,omitempty"`
 	// Concise adds the caveman-style concise reply rules to the global rules.
 	Concise bool `json:"concise"`
+	// SpecLanguage is the language of the SDD spec, plan and tasks: one of
+	// SpecLanguages. Installs recorded before it existed have it empty and
+	// keep "es", the language the agents used to require.
+	SpecLanguage string `json:"specLanguage,omitempty"`
 }
 
 // Personas are the persona choices; "none" adds nothing.
 var Personas = []string{"none", "architect"}
 
+// SpecLanguages are the languages the SDD documents can be written in.
+var SpecLanguages = []string{"es", "en"}
+
+// specLanguageValues fill the placeholders that depend on the spec language.
+var specLanguageValues = map[string]map[string]string{
+	"es": {"SPEC_LANGUAGE": "Spanish", "EARS_EXAMPLE": "CUANDO <evento>, el sistema DEBERÁ <respuesta>", "DONE_WHEN": "Hecho cuando:"},
+	"en": {"SPEC_LANGUAGE": "English", "EARS_EXAMPLE": "WHEN <event>, the system SHALL <response>", "DONE_WHEN": "Done when:"},
+}
+
 // DefaultComponents selects everything but the subagent monitor, with the
 // architect persona and the concise style.
 func DefaultComponents() Components {
 	return Components{SDD: true, Android: true, Skills: true, Plugin: true, Engram: true, CodeGraph: true,
-		Persona: "architect", Concise: true}
+		Persona: "architect", Concise: true, SpecLanguage: "es"}
 }
 
 // SelectedPersona is the persona to install, "architect" for installs that
@@ -74,6 +87,15 @@ func (c Components) SelectedPersona() string {
 		return "architect"
 	}
 	return c.Persona
+}
+
+// SelectedSpecLanguage is the language of the SDD documents, "es" for
+// installs that predate the choice.
+func (c Components) SelectedSpecLanguage() string {
+	if c.SpecLanguage == "" {
+		return "es"
+	}
+	return c.SpecLanguage
 }
 
 // Options configure a run.
@@ -299,7 +321,7 @@ func (r *run) values(t Target) map[string]string {
 		return name
 	}
 	deliverables, _ := filepath.Abs(expandHome(r.opts.DeliverablesDir, r.home))
-	return map[string]string{
+	values := map[string]string{
 		"OPENCODE_TMP":         slash(dirs.tmp),
 		"OPENCODE_TOOL_OUTPUT": slash(filepath.Join(dirs.data, "tool-output")),
 		"DELIVERABLES":         slash(deliverables),
@@ -309,6 +331,10 @@ func (r *run) values(t Target) map[string]string {
 		"BIN_ENGRAM":           bin("engram"),
 		"BIN_CODEGRAPH":        bin("codegraph"),
 	}
+	for k, v := range specLanguageValues[r.opts.Components.SelectedSpecLanguage()] {
+		values[k] = v
+	}
+	return values
 }
 
 // ── Files, backups and blocks ────────────────────────────────────────────────

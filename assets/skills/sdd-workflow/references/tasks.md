@@ -23,7 +23,7 @@ authorization to implement. Preserve all existing spec and review workflows.
    question limits.
 5. Review task IDs, unchecked new checkboxes, realistic estimates strictly under
    30 minutes including required verification, exact RF associations, and one
-   verifiable completion line per task (`Hecho cuando:` in Spanish). Check that
+   verifiable completion line per task (`@@DONE_WHEN@@`). Check that
    dependencies exist and appear earlier, with no cycles or self-dependencies.
    Review RF coverage and all verification promised by the plan. Reject invented
    scope, decisions, dependencies, or task-completion claims. An indivisible

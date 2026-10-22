@@ -678,6 +678,33 @@ func TestPersonaInRules(t *testing.T) {
 	}
 }
 
+func TestSpecLanguage(t *testing.T) {
+	for _, c := range []struct {
+		language, want, notWant string
+	}{
+		{"en", "Done when:", "Hecho cuando:"},
+		{"es", "Hecho cuando:", "Done when:"},
+		{"", "Hecho cuando:", "Done when:"}, // installs recorded before the choice keep Spanish
+	} {
+		home := t.TempDir()
+		opts := testOptions(home)
+		opts.Targets = []string{"claude"}
+		opts.Components.SpecLanguage = c.language
+		if _, err := Install(opts, testLogger{t}); err != nil {
+			t.Fatal(err)
+		}
+		for _, f := range []string{"agents/sdd-tasks.md", "agents/sdd-apply.md", "skills/sdd-workflow/references/tasks.md"} {
+			data, _ := os.ReadFile(filepath.Join(opts.ClaudeDir, f))
+			if text := string(data); !strings.Contains(text, c.want) || strings.Contains(text, c.notWant) {
+				t.Errorf("language %q: %s lacks %q or keeps %q", c.language, f, c.want, c.notWant)
+			}
+		}
+	}
+	if _, err := Install(Options{Home: t.TempDir(), Targets: []string{"claude"}, Components: Components{SpecLanguage: "fr"}}, testLogger{t}); err == nil {
+		t.Error("unknown spec language accepted")
+	}
+}
+
 func TestOrchestratorsCarryNoPersona(t *testing.T) {
 	home := t.TempDir()
 	opts := testOptions(home)

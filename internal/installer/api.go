@@ -54,6 +54,9 @@ func Install(opts Options, log Logger) (res *Result, err error) {
 	if p := opts.Components.SelectedPersona(); !contains(Personas, p) {
 		return nil, fmt.Errorf("unknown persona %q (choose: %s)", p, strings.Join(Personas, ", "))
 	}
+	if l := opts.Components.SelectedSpecLanguage(); !contains(SpecLanguages, l) {
+		return nil, fmt.Errorf("unknown spec language %q (choose: %s)", l, strings.Join(SpecLanguages, ", "))
+	}
 	if blockers := Blockers(checkRequirements(opts)); len(blockers) > 0 {
 		var names []string
 		for _, b := range blockers {

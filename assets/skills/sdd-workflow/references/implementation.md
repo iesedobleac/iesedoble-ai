@@ -12,7 +12,7 @@ Approval of specs, plans, or tasks does not itself authorize execution.
    infer freshness from file existence; unresolved linkage blocks affected work.
    You own these checks: the task exists exactly once in tasks.md, is unchecked,
    its dependencies are complete, its RFs exist in the spec, and it has a clear
-   `Hecho cuando:` criterion. A failed check blocks delegation.
+   `@@DONE_WHEN@@` criterion. A failed check blocks delegation.
 2. Delegate to `sdd-apply` by reference, never by paraphrase. Its model is
    cheaper, so the assignment must be closed:
 

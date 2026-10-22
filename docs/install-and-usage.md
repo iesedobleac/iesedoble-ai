@@ -181,6 +181,7 @@ iesedoble-ai install --dry-run             # show what would change
 iesedoble-ai install --targets claude --without android,codegraph
 iesedoble-ai install --with subagent-monitor,claude-sandbox
 iesedoble-ai install --persona none --concise=false   # assistant's default voice
+iesedoble-ai install --spec-language en              # SDD documents in English
 iesedoble-ai install --planner openai/gpt-5.5 --claude-reviewer opus
 iesedoble-ai install --claude-executor haiku --claude-executor-effort low
 ```

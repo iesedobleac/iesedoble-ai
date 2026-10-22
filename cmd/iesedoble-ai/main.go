@@ -93,6 +93,7 @@ func install(args []string) {
 	fs.Var(&without, "without", "skip components: sdd, android, skills, plugin, engram, codegraph")
 	fs.Var(&with, "with", "add components that are off by default: subagent-monitor, claude-sandbox")
 	persona := fs.String("persona", "architect", "persona added to the global rules: "+strings.Join(installer.Personas, ", "))
+	specLanguage := fs.String("spec-language", "es", "language of the SDD spec, plan and tasks: "+strings.Join(installer.SpecLanguages, ", "))
 	concise := fs.Bool("concise", true, "caveman-style concise replies (use --concise=false to skip)")
 	models, efforts := map[string]render.Models{}, map[string]render.Efforts{}
 	for _, t := range installer.AllTargets {
@@ -128,7 +129,7 @@ func install(args []string) {
 	_ = fs.Parse(args)
 
 	comps := installer.DefaultComponents()
-	comps.Persona, comps.Concise = *persona, *concise
+	comps.Persona, comps.Concise, comps.SpecLanguage = *persona, *concise, *specLanguage
 	for _, w := range with {
 		switch w {
 		case "subagent-monitor":

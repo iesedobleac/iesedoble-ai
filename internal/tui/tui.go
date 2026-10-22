@@ -271,6 +271,10 @@ func New() Model {
 		{key: "concise", label: "Concise",
 			desc:    "caveman-style replies: answer first, no filler, code and errors verbatim; cuts output tokens (~600 tokens)",
 			checked: comps.Concise, section: "Style"},
+		{key: "spec-es", label: "Español", desc: "SDD spec, plan and tasks in Spanish",
+			checked: comps.SelectedSpecLanguage() == "es", group: "spec", section: "SDD documents"},
+		{key: "spec-en", label: "English", desc: "SDD spec, plan and tasks in English",
+			checked: comps.SelectedSpecLanguage() == "en", group: "spec", section: "SDD documents"},
 	}
 
 	models, efforts := map[string]render.Models{}, map[string]render.Efforts{}
@@ -350,6 +354,10 @@ func (m Model) options() installer.Options {
 		SubagentMonitor: m.monitor, ClaudeSandbox: m.sandbox, Persona: "none", Concise: comps["concise"]}
 	if comps["persona-architect"] {
 		opts.Components.Persona = "architect"
+	}
+	opts.Components.SpecLanguage = "es"
+	if comps["spec-en"] {
+		opts.Components.SpecLanguage = "en"
 	}
 	opts.Efforts = map[string]render.Efforts{}
 	for i, k := range m.modelKeys {
@@ -852,7 +860,7 @@ func (m Model) View() string {
 		b.WriteString(title.Render("Components") + subtle.Render("  (2/6)") + "\n\n" + m.components.view())
 		b.WriteString(help("space toggle · a all · enter next · esc back"))
 	case scPersona:
-		b.WriteString(title.Render("Persona") + subtle.Render("  (3/6) how your assistant talks to you") + "\n\n" + m.persona.view())
+		b.WriteString(title.Render("Persona") + subtle.Render("  (3/6) how your assistant talks to you and writes SDD documents") + "\n\n" + m.persona.view())
 		if d := personaDetails[m.persona.items[m.persona.cursor].key]; len(d) > 0 {
 			b.WriteString("\n" + box.Render(strings.Join(d, "\n")) + "\n")
 		}
@@ -1183,6 +1191,20 @@ var personaDetails = map[string][]string{
 		"",
 		"Cost: ~600 tokens of rules; it cuts output tokens, the expensive ones.",
 	},
+	"spec-es": {
+		"The SDD agents write spec.md, plan.md and tasks.md in neutral Spanish:",
+		"EARS as \"CUANDO <evento>, el sistema DEBERÁ <respuesta>\",",
+		"tasks closed by \"Hecho cuando:\".",
+		"",
+		"Replies still follow the language you write in.",
+	},
+	"spec-en": {
+		"The SDD agents write spec.md, plan.md and tasks.md in English:",
+		"EARS as \"WHEN <event>, the system SHALL <response>\",",
+		"tasks closed by \"Done when:\".",
+		"",
+		"Replies still follow the language you write in.",
+	},
 }
 
 // menuView is the links, the install status and the menu options.
@@ -1348,16 +1370,21 @@ func (m Model) reviewView() string {
 		}
 		b.WriteString(strings.TrimRight(line, " ") + "\n")
 	}
-	persona, style := "None", "normal"
+	persona, style, specs := "None", "normal", ""
 	for _, it := range m.persona.items {
 		switch {
 		case it.group == "persona" && it.checked:
 			persona = it.label
 		case it.key == "concise" && it.checked:
 			style = "concise"
+		case it.group == "spec" && it.checked:
+			specs = it.label
 		}
 	}
 	b.WriteString("\n" + section.Render("Persona") + "\n  " + persona + subtle.Render(" · ") + style + " replies\n")
+	if opts.Components.SDD {
+		b.WriteString("\n" + section.Render("SDD documents") + "\n  " + specs + "\n")
+	}
 	if rows := m.settingRows(); len(rows) > 0 {
 		b.WriteString("\n" + section.Render("Settings") + "\n")
 		for _, s := range rows {

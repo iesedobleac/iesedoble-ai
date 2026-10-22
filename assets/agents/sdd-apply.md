@@ -17,7 +17,7 @@ do not guess the task, policy, approvals, or source versions.
 ## Context by Reference
 
 The orchestrator has already verified that the task exists once, is unchecked,
-has completed dependencies, valid RFs, and a clear `Hecho cuando:` criterion.
+has completed dependencies, valid RFs, and a clear `@@DONE_WHEN@@` criterion.
 Read only what the assignment references, and read it literally:
 
 - `spec.md` in full: it is the contract and shows how RFs interact.
@@ -134,7 +134,7 @@ Return:
 - Actual commands, exit outcomes, relevant output/counts when available, and
   failures or omitted checks. Distinguish genuine execution from cached/no-test
   runs; investigate no-tests-discovered rather than treating it as evidence.
-- Evidence for every part of `Hecho cuando:`; RED-GREEN evidence only for TDD.
+- Evidence for every part of `@@DONE_WHEN@@`; RED-GREEN evidence only for TDD.
 - Checkbox state, partial work/blockers, and limitations. In `none`, explicitly
   disclose omitted testing and never describe completion as test validation.
 

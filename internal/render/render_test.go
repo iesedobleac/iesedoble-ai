@@ -15,6 +15,7 @@ var values = map[string]string{
 	"OPENCODE_TMP": "/tmp/opencode", "OPENCODE_TOOL_OUTPUT": "/data/tool-output", "DELIVERABLES": "/home/u/deliverables",
 	"ANDROID_SDK": "/sdk", "GRADLE_CACHES": "/gradle/caches", "SKILLS_DIR": "/skills",
 	"BIN_ENGRAM": "engram", "BIN_CODEGRAPH": "codegraph",
+	"SPEC_LANGUAGE": "English", "EARS_EXAMPLE": "WHEN <event>, the system SHALL <response>", "DONE_WHEN": "Done when:",
 }
 
 var models = render.Models{"planner": "p/planner", "analyst": "p/analyst", "executor": "p/executor", "scout": "p/scout", "reviewer": "p/reviewer"}
